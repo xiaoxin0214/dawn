@@ -1,0 +1,26 @@
+{
+  "name": "dawn",
+  "version": "1.0.0",
+  "description": "",
+  "main": "src/index.ts",
+  "type": "module",
+  "scripts": {
+    "build": "rollup --config"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/xiaoxin0214/dawn.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/xiaoxin0214/dawn/issues"
+  },
+  "homepage": "https://github.com/xiaoxin0214/dawn#readme",
+  "devDependencies": {
+    "@rollup/plugin-typescript": "^11.1.5",
+    "rollup": "^4.4.0",
+    "tslib": "^2.6.2",
+    "typescript": "^5.2.2"
+  }
+}
