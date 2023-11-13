@@ -1,0 +1,16 @@
+{
+    "$schema": "https://typedoc.org/schema.json",
+    "entryPoints": [
+        "src/index.ts"
+    ],
+    "includeVersion": false,
+    "excludePrivate":true,
+    "excludeProtected":true,
+    "excludeReferences":true,
+    "disableSources":true,
+    "githubPages":false,
+    "visibilityFilters": {},
+    "disableGit":true,
+    "theme": "default",
+    "lightHighlightTheme":"light-plus"
+}
