@@ -12,7 +12,7 @@ class Vector2 extends BaseObject implements ICloneable {
      * @param x x component
      * @param y y component
      */
-    constructor(x: number, y: number) {
+    constructor(x: number=0.0, y: number=0.0) {
         super();
         this.x = x;
         this.y = y;
