@@ -4,7 +4,7 @@ import BaseObject from "../base/BaseObject";
 export type Vector2Constructor<T extends Vector2> = new (...args: ConstructorParameters<typeof Vector2>) => T;
 
 /**
- * represent a vector contains two coordinates
+ * represent a vector contains two components
  */
 class Vector2 extends BaseObject implements ICloneable {
     /**
