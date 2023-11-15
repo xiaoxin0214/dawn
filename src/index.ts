@@ -3,6 +3,7 @@ import ICloneable from "./base/ICloneable";
 import IDisposable from "./base/IDisposable";
 import Vector2 from "./math/Vector2"
 import Vector3 from "./math/Vector3"
+import Plane from "./math/Plane";
 
 export {
     ICloneable,
@@ -12,5 +13,6 @@ export {
 
 export {
     Vector2,
-    Vector3
+    Vector3,
+    Plane
 }
