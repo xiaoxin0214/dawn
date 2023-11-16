@@ -6,7 +6,7 @@ export type Vector2Constructor<T extends Vector2> = new (...args: ConstructorPar
 /**
  * represent a vector contains two components
  */
-class Vector2 extends BaseObject implements ICloneable {
+class Vector2 extends BaseObject implements ICloneable<Vector2> {
     /**
      * create a new Vector2 object from the given x,y component
      * @param x x component

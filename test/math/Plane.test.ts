@@ -30,7 +30,7 @@ describe("test Plane", () => {
 
     test("clone", () => {
         const plane = new Plane(1.0, 0.0, 0.0, 1.0);
-        expect(plane).toEqual(new Plane(1.0, 0.0, 0.0, 1.0));
+        expect(plane.clone()).toEqual(new Plane(1.0, 0.0, 0.0, 1.0));
     })
 
     test("FromNormalAndPoint", () => {

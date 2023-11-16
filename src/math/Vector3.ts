@@ -5,7 +5,7 @@ export type Vector3LikeConstructor<T extends Vector3> = new (...args: Constructo
 /**
  * represent a vector contains 3 components
  */
-class Vector3 extends BaseObject implements ICloneable {
+class Vector3 extends BaseObject implements ICloneable<Vector3> {
     /**
      * create a new Vector3 object from given x,y,z components
      * @param x the x component

@@ -40,15 +40,7 @@ describe("test Matrix3", () => {
 
     test("invert", () => {
         const matrix = new Matrix3(1.0, 5.0, 2.0, 1.0, 1.0, 7.0, 0.0, -3.0, 4.0);
-        const result = new Matrix3(-25.0,
-            26.0,
-            -33.0,
-            4.0,
-            -4.0,
-            5.0,
-            3.0,
-            -3.0,
-            4.0);
+        const result = new Matrix3(-25.0, 26.0, -33.0, 4.0, -4.0, 5.0, 3.0, -3.0, 4.0);
         expect(matrix.invert()).toEqual(result);
     })
 
@@ -77,6 +69,6 @@ describe("test Matrix3", () => {
 
     test("clone", () => {
         const matrix = new Matrix3();
-        expect(matrix).toEqual(new Matrix3());
+        expect(matrix.clone()).toEqual(new Matrix3());
     })
 })

@@ -4,7 +4,7 @@ import Vector3 from "./Vector3";
 /**
  * represents a plane defined by the equation ax+by+cz+d=0
  */
-class Plane extends BaseObject implements ICloneable {
+class Plane extends BaseObject implements ICloneable<Plane> {
     /**
      * create a new Plane object from the given floats
      * @param a the a component of the plane
@@ -64,8 +64,8 @@ class Plane extends BaseObject implements ICloneable {
      * creates a new Plane object copied from the current Plane object
      * @returns a new Plane object
      */
-    clone(): this {
-        return this.constructor(this.normal.x, this.normal.y, this.normal.z, this.distance);
+    clone(): Plane {
+        return new Plane(this.normal.x, this.normal.y, this.normal.z, this.distance);
     }
 
     /**

@@ -5,7 +5,7 @@ import { FloatArray, Nullable, float } from "../base/Type";
 /**
  * a 3*3 matrix,stored in column-major order array
  */
-class Matrix3 extends BaseObject implements ICloneable {
+class Matrix3 extends BaseObject implements ICloneable<Matrix3> {
     /**
      * create a new Matrix3 object from the given elements, in row-major order for code readability
      * @param row0column0 
@@ -71,6 +71,14 @@ class Matrix3 extends BaseObject implements ICloneable {
     }
 
     /**
+    * check if the current matrix is identity
+    * @returns true if the current matrix is identity
+    */
+    isIdentity(): boolean {
+        return Matrix3.IDENTITY.equals(this);
+    }
+
+    /**
      * returns the determinant of the current matrix
      * @returns the determinant of the current matrix
      */
@@ -129,14 +137,6 @@ class Matrix3 extends BaseObject implements ICloneable {
         elements[8] = (e11 * e00 - e10 * e01) * detInv;
 
         return this;
-    }
-
-    /**
-     * check if the current matrix is identity
-     * @returns true if the current matrix is identity
-     */
-    isIdentity(): boolean {
-        return Matrix3.IDENTITY.equals(this);
     }
 
     /**
@@ -204,8 +204,8 @@ class Matrix3 extends BaseObject implements ICloneable {
      * create a new Matrix3 object copied from the current Matrix3 object
      * @returns 
      */
-    clone(): this {
-        return this.constructor(this.elements[0], this.elements[3], this.elements[6],
+    clone(): Matrix3 {
+        return new Matrix3(this.elements[0], this.elements[3], this.elements[6],
             this.elements[1], this.elements[4], this.elements[7],
             this.elements[2], this.elements[5], this.elements[8]);
     }
