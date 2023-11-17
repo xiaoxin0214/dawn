@@ -65,28 +65,28 @@ describe("test Vector3", () => {
 
     test("normalize", () => {
         const vec3 = new Vector3(2.0, 0.0, 0.0);
-        expect(vec3.normalize()).toEqual(new Vector3(1.0,0.0,0.0));
+        expect(vec3.normalize()).toEqual(new Vector3(1.0, 0.0, 0.0));
     })
 
     test("distanceTo", () => {
         const vec3 = new Vector3(2.0, 0.0, 0.0);
-        expect(vec3.distanceTo(new Vector3(1.0,0.0,0.0))).toEqual(1.0);
+        expect(vec3.distanceTo(new Vector3(1.0, 0.0, 0.0))).toEqual(1.0);
     })
 
     test("squaredDistanceTo", () => {
         const vec3 = new Vector3(2.0, 0.0, 0.0);
-        expect(vec3.squaredDistanceTo(new Vector3(4.0,0.0,0.0))).toEqual(4.0);
+        expect(vec3.squaredDistanceTo(new Vector3(4.0, 0.0, 0.0))).toEqual(4.0);
     })
 
     test("dot", () => {
         const vec3 = new Vector3(2.0, 0.0, 0.0);
-        expect(vec3.dot(new Vector3(4.0,0.0,0.0))).toEqual(8.0);
+        expect(vec3.dot(new Vector3(4.0, 0.0, 0.0))).toEqual(8.0);
     })
 
     test("Cross", () => {
         const value1 = new Vector3(1.0, 0.0, 0.0);
         const value2 = new Vector3(0.0, 1.0, 0.0)
-        expect(Vector3.Cross(value1,value2)).toEqual(new Vector3(0.0,0.0,1.0));
+        expect(Vector3.Cross(value1, value2)).toEqual(new Vector3(0.0, 0.0, 1.0));
     })
 
     test("toString", () => {
