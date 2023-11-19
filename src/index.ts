@@ -7,6 +7,7 @@ import Vector4 from "./math/Vector4";
 import Matrix3 from "./math/Matrix3";
 import Matrix4 from "./math/Matrix4";
 import Plane from "./math/Plane";
+import Ellipsoid from "./gis/Ellipsoid";
 import { float,FloatArray,Nullable } from "./base/Type";
 
 export {
@@ -27,5 +28,6 @@ export {
     Vector4,
     Matrix3,
     Matrix4,
-    Plane
+    Plane,
+    Ellipsoid
 }
