@@ -3,7 +3,7 @@ import BaseObject from "../base/BaseObject";
 import { Vector3, float } from "../index";
 
 /**
- * represents a Ellipsoid defined by the equation (x/1)^2+(y/b)^2+(z/c)^2=1
+ * represents a Ellipsoid defined by the equation (x/a)^2+(y/b)^2+(z/c)^2=1
  */
 class Ellipsoid extends BaseObject implements ICloneable<Ellipsoid>
 {
