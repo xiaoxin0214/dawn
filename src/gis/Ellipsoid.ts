@@ -1,6 +1,7 @@
 import ICloneable from "../base/ICloneable";
 import BaseObject from "../base/BaseObject";
-import { Vector3, float } from "../index";
+import Vector3 from "../math/Vector3";
+import { float } from "../base/Type";
 
 /**
  * represents a Ellipsoid defined by the equation (x/a)^2+(y/b)^2+(z/c)^2=1

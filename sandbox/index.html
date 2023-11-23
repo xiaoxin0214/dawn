@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+	<title>dawn sandbox</title>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+</head>
+
+<body>
+
+	<script type="importmap">
+			{
+				"imports": {
+					"dawn": "../lib/dawn.esm.js"
+				}
+			}
+		</script>
+
+	<script type="module">
+
+		import { Renderer, RendererParam } from 'dawn';
+		let rendererParam = new RendererParam();
+		rendererParam.containerID = "container";
+		let renderer = new Renderer(rendererParam)
+		renderer.init().then(() => {
+			renderer.clearColor = { r: 0.0, g: 1.0, b: 1.0, a: 1.0 }
+			renderer.beginScene();
+			renderer.endScene();
+		})
+
+
+	</script>
+	<style>
+		* {
+			margin: 0;
+			padding: 0;
+		}
+
+		#container {
+			width: auto;
+			height: calc(100vh);
+			overflow: hidden;
+		}
+	</style>
+	<div id="container">
+	</div>
+</body>
+
+</html>

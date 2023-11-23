@@ -1,7 +1,7 @@
 import BaseObject from "./base/BaseObject";
 import ICloneable from "./base/ICloneable";
 import IDisposable from "./base/IDisposable";
-import { float,FloatArray,Nullable } from "./base/Type";
+import { float, FloatArray, Nullable } from "./base/Type";
 
 import DawnMath from "./math/DawnMath";
 import Vector2 from "./math/Vector2"
@@ -14,6 +14,8 @@ import Plane from "./math/Plane";
 import Cartographic from "./gis/Cartographic";
 import Ellipsoid from "./gis/Ellipsoid";
 
+import RendererParam from "./renderer/RendererParam";
+import Renderer from "./renderer/Renderer";
 
 export {
     float,
@@ -34,7 +36,15 @@ export {
     Vector4,
     Matrix3,
     Matrix4,
-    Plane,
+    Plane
+}
+
+export {
     Cartographic,
     Ellipsoid
+}
+
+export {
+    RendererParam,
+    Renderer
 }
