@@ -1,32 +1,20 @@
+import Shader from "./Shader";
+import VertexBufferLayout from "./VertexBufferLayout";
+
 class Pipeline {
-    constructor(device: GPUDevice, vertexSource: string, fragmentSource: string) {
+    constructor(device: GPUDevice, shader: Shader, vbLayoutLst: Array<VertexBufferLayout>) {
         this.m_device = device;
 
         this.m_pipeline = device.createRenderPipeline({
             layout: 'auto',
             vertex: {
-                module: device.createShaderModule({
-                    code: vertexSource,
-                }),
+                module: shader.getVertexShaderModule(),
                 entryPoint: 'main',
 
-                buffers: [
-                    {
-                        arrayStride: 16,
-                        attributes: [
-                            {
-                                shaderLocation: 0,
-                                offset: 0,
-                                format: 'float32x4',
-                            },
-                        ],
-                    },
-                ],
+                buffers: VertexBufferLayout.CreateGPUVertexBufferLayoutLst(vbLayoutLst),
             },
             fragment: {
-                module: device.createShaderModule({
-                    code: fragmentSource,
-                }),
+                module: shader.getFragmentShaderModule(),
                 entryPoint: 'main',
                 targets: [
                     {

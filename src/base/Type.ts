@@ -3,6 +3,10 @@
  */
 export type float = number;
 /**
+ * alias type for number that are integers
+ */
+export type int = number;
+/**
  * alias type for number array or float32array
  */
 export type FloatArray = number[] | Float32Array;

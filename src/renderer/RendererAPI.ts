@@ -4,6 +4,9 @@ import RenderContext from "./RenderContext";
 import IndexBuffer from "./IndexBuffer";
 import VertexBuffer from "./VertexBuffer";
 import Pipeline from "./Pipeline";
+import VertexBufferLayout from "./VertexBufferLayout";
+import VertexAttribute from "./VertexAttribute";
+import Shader from "./Shader";
 
 class RendererAPI {
     constructor(params: RendererParam) {
@@ -131,29 +134,41 @@ class RendererAPI {
         if (!currentPass || !device)
             return;
 
-        const vertexSrc=`@vertex
+        const vertexSrc = `
+        struct VertexOutput {
+            @builtin(position) Position : vec4<f32>,
+            @location(0) color : vec4<f32>,
+          }
+
+        @vertex
         fn main(
-          @location(0) pos : vec4<f32>
-        ) -> @builtin(position) vec4<f32> {
-          return pos;
+          @location(0) pos : vec4<f32>,
+          @location(1) color : vec4<f32>
+        ) -> VertexOutput {
+            var output : VertexOutput;
+            output.Position = pos;
+            output.color = color;
+            return output;
         }`;
-        const fragmentSrc=`@fragment
-        fn main() -> @location(0) vec4<f32> {
-          return vec4(1.0, 0.0, 0.0, 1.0);
+        const fragmentSrc = `@fragment
+        fn main(  @location(0) color: vec4<f32>) -> @location(0) vec4<f32> {
+          return color;
         }`;
-        const vertices=new Float32Array(6*4);
+        const vertices = new Float32Array(6 * 4 * 2);
         vertices.set([
-            -0.5,-0.5,0,1,
-            0.5,-0.5,0,1,
-            -0.5,0.5,0,1,
-            0.5,-0.5,0,1,
-            0.5,0.5,0,1,
-            -0.5,0.5,0,1]);
+            -0.5, -0.5, 0, 1, 1.0, 0.0, 0.0, 1.0,
+            0.5, -0.5, 0, 1, 0.0, 1.0, 0.0, 1.0,
+            -0.5, 0.5, 0, 1, 0.0, 0.0, 1.0, 1.0,
+            0.5, -0.5, 0, 1, 1.0, 0.0, 0.0, 1.0,
+            0.5, 0.5, 0, 1, 0.0, 1.0, 0.0, 10.0,
+            -0.5, 0.5, 0, 1, 0.0, 0.0, 1.0, 1.0,]);
         const vb = new VertexBuffer(device, vertices);
-        const pipeline=new Pipeline(device,vertexSrc,fragmentSrc);
+        const vertexBufferLayout = new VertexBufferLayout([new VertexAttribute('float32x4', "a_pos"), new VertexAttribute('float32x4', "a_color")]);
+        const shader = new Shader(device, vertexSrc, fragmentSrc);
+        const pipeline = new Pipeline(device, shader, [vertexBufferLayout]);
         currentPass.setPipeline(pipeline.pipeline);
         currentPass.setVertexBuffer(0, vb.buffer);
-        currentPass.draw(vertices.length/4);
+        currentPass.draw(vertices.length / 8);
     }
 
     getDrawingBufferSize(): Vector2 {
