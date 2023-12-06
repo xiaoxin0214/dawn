@@ -1,6 +1,7 @@
 import ICloneable from "../base/ICloneable";
 import BaseObject from "../base/BaseObject";
 import { float, FloatArray } from "../base/Type";
+import Vector3 from "./Vector3";
 
 /**
  * a 4*4 matrix,stored in column-major order array
@@ -278,6 +279,95 @@ class Matrix4 extends BaseObject implements ICloneable<Matrix4> {
     }
 
     /**
+     * set the current matrix as a translate transform
+     * @param translate 
+     * @returns the current updated matrix
+     */
+    fromTranslation(translate: Vector3): Matrix4 {
+        this.set(
+            1, 0, 0, translate.x,
+            0, 1, 0, translate.y,
+            0, 0, 1, translate.z,
+            0, 0, 0, 1
+        );
+        return this;
+    }
+
+    /**
+     * set the current matrix as a scale transform
+     * @param scale 
+     * @returns the current updated matrix
+     */
+    fromScale(scale: Vector3): Matrix4 {
+        this.set(
+            scale.x, 0, 0, 0,
+            0, scale.y, 0, 0,
+            0, 0, scale.z, 0,
+            0, 0, 0, 1
+        );
+        return this;
+    }
+
+    /**
+     * set the current matrix as rotation transform around axis angle radians
+     * @param axis rotation axis,must be normalized
+     * @param angle rotation angle in radians
+     * @returns 
+     */
+    fromRotationAxis(axis:Vector3,angle:number):Matrix4{
+        const c = Math.cos( angle );
+		const s = Math.sin( angle );
+		const t = 1 - c;
+		const x = axis.x, y = axis.y, z = axis.z;
+		const tx = t * x, ty = t * y;
+
+		this.set(
+
+			tx * x + c, tx * y - s * z, tx * z + s * y, 0,
+			tx * y + s * z, ty * y + c, ty * z - s * x, 0,
+			tx * z - s * y, ty * z + s * x, t * z * z + c, 0,
+			0, 0, 0, 1
+
+		);
+
+		return this;
+    }
+
+    /**
+     * write the elements of the current matrix to an array in column-major format
+     * @param array array to store the result
+     * @param offset offset in the array of which to put the result
+     * @returns result array
+     */
+    toArray(array: number[] | undefined = undefined, offset: number = 0): number[] {
+        const te = this.elements;
+        if (array === undefined)
+            array = [];
+
+        array[offset] = te[0];
+        array[offset + 1] = te[1];
+        array[offset + 2] = te[2];
+        array[offset + 3] = te[3];
+
+        array[offset + 4] = te[4];
+        array[offset + 5] = te[5];
+        array[offset + 6] = te[6];
+        array[offset + 7] = te[7];
+
+        array[offset + 8] = te[8];
+        array[offset + 9] = te[9];
+        array[offset + 10] = te[10];
+        array[offset + 11] = te[11];
+
+        array[offset + 12] = te[12];
+        array[offset + 13] = te[13];
+        array[offset + 14] = te[14];
+        array[offset + 15] = te[15];
+
+        return array;
+    }
+
+    /**
      * computes the product of two matrices
      * @param a the first matrix
      * @param b the second matrix
@@ -325,6 +415,39 @@ class Matrix4 extends BaseObject implements ICloneable<Matrix4> {
         return result;
     }
 
+    static MakePerspective(fov:number,aspect:number,near:number,far:number,result:Matrix4|undefined=undefined):Matrix4
+    {
+        if(result===undefined)
+        {
+            result=new Matrix4();
+        }
+
+        const bottom = Math.tan(fov * 0.5);
+
+        const column1Row1 = 1.0 / bottom;
+        const column0Row0 = column1Row1 / aspect;
+        const column2Row2 = (far + near) / (near - far);
+        const column3Row2 = (2.0 * far * near) / (near - far);
+      
+        const elements = result.elements;
+        elements[0] = column0Row0;
+        elements[1] = 0.0;
+        elements[2] = 0.0;
+        elements[3] = 0.0;
+        elements[4] = 0.0;
+        elements[5] = column1Row1;
+        elements[6] = 0.0;
+        elements[7] = 0.0;
+        elements[8] = 0.0;
+        elements[9] = 0.0;
+        elements[10] = column2Row2;
+        elements[11] = -1.0;
+        elements[12] = 0.0;
+        elements[13] = 0.0;
+        elements[14] = column3Row2;
+        elements[15] = 0.0;
+        return result;
+    }
     static readonly IDENTITY: Matrix4 = new Matrix4();
 
     /**

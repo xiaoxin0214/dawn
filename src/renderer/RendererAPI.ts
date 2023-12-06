@@ -7,6 +7,10 @@ import Pipeline from "./Pipeline";
 import VertexBufferLayout from "./VertexBufferLayout";
 import VertexAttribute from "./VertexAttribute";
 import Shader from "./Shader";
+import UniformBuffer from "./UniformBuffer";
+import Matrix4 from "../math/Matrix4";
+import Vector3 from "../math/Vector3";
+import { DawnMath } from "../index";
 
 class RendererAPI {
     constructor(params: RendererParam) {
@@ -26,6 +30,7 @@ class RendererAPI {
         const adapterOptions = {
             powerPreference: this.m_params.powerPreference
         };
+
         const adapter = await navigator.gpu.requestAdapter(adapterOptions);
         if (null == adapter) {
             throw new Error("创建适配器失败!");
@@ -135,6 +140,11 @@ class RendererAPI {
             return;
 
         const vertexSrc = `
+        struct Uniforms {
+            modelViewProjectionMatrix : mat4x4<f32>,
+        }
+        @binding(0) @group(0) var<uniform> uniforms : Uniforms;
+
         struct VertexOutput {
             @builtin(position) Position : vec4<f32>,
             @location(0) color : vec4<f32>,
@@ -146,7 +156,7 @@ class RendererAPI {
           @location(1) color : vec4<f32>
         ) -> VertexOutput {
             var output : VertexOutput;
-            output.Position = pos;
+            output.Position = uniforms.modelViewProjectionMatrix * pos;
             output.color = color;
             return output;
         }`;
@@ -154,21 +164,81 @@ class RendererAPI {
         fn main(  @location(0) color: vec4<f32>) -> @location(0) vec4<f32> {
           return color;
         }`;
-        const vertices = new Float32Array(6 * 4 * 2);
+        const vertices = new Float32Array(36 * 10);
         vertices.set([
-            -0.5, -0.5, 0, 1, 1.0, 0.0, 0.0, 1.0,
-            0.5, -0.5, 0, 1, 0.0, 1.0, 0.0, 1.0,
-            -0.5, 0.5, 0, 1, 0.0, 0.0, 1.0, 1.0,
-            0.5, -0.5, 0, 1, 1.0, 0.0, 0.0, 1.0,
-            0.5, 0.5, 0, 1, 0.0, 1.0, 0.0, 10.0,
-            -0.5, 0.5, 0, 1, 0.0, 0.0, 1.0, 1.0,]);
+            // float4 position, float4 color, float2 uv,
+            1, -1, 1, 1,   1, 0, 1, 1,  0, 1,
+            -1, -1, 1, 1,  0, 0, 1, 1,  1, 1,
+            -1, -1, -1, 1, 0, 0, 0, 1,  1, 0,
+            1, -1, -1, 1,  1, 0, 0, 1,  0, 0,
+            1, -1, 1, 1,   1, 0, 1, 1,  0, 1,
+            -1, -1, -1, 1, 0, 0, 0, 1,  1, 0,
+          
+            1, 1, 1, 1,    1, 1, 1, 1,  0, 1,
+            1, -1, 1, 1,   1, 0, 1, 1,  1, 1,
+            1, -1, -1, 1,  1, 0, 0, 1,  1, 0,
+            1, 1, -1, 1,   1, 1, 0, 1,  0, 0,
+            1, 1, 1, 1,    1, 1, 1, 1,  0, 1,
+            1, -1, -1, 1,  1, 0, 0, 1,  1, 0,
+          
+            -1, 1, 1, 1,   0, 1, 1, 1,  0, 1,
+            1, 1, 1, 1,    1, 1, 1, 1,  1, 1,
+            1, 1, -1, 1,   1, 1, 0, 1,  1, 0,
+            -1, 1, -1, 1,  0, 1, 0, 1,  0, 0,
+            -1, 1, 1, 1,   0, 1, 1, 1,  0, 1,
+            1, 1, -1, 1,   1, 1, 0, 1,  1, 0,
+          
+            -1, -1, 1, 1,  0, 0, 1, 1,  0, 1,
+            -1, 1, 1, 1,   0, 1, 1, 1,  1, 1,
+            -1, 1, -1, 1,  0, 1, 0, 1,  1, 0,
+            -1, -1, -1, 1, 0, 0, 0, 1,  0, 0,
+            -1, -1, 1, 1,  0, 0, 1, 1,  0, 1,
+            -1, 1, -1, 1,  0, 1, 0, 1,  1, 0,
+          
+            1, 1, 1, 1,    1, 1, 1, 1,  0, 1,
+            -1, 1, 1, 1,   0, 1, 1, 1,  1, 1,
+            -1, -1, 1, 1,  0, 0, 1, 1,  1, 0,
+            -1, -1, 1, 1,  0, 0, 1, 1,  1, 0,
+            1, -1, 1, 1,   1, 0, 1, 1,  0, 0,
+            1, 1, 1, 1,    1, 1, 1, 1,  0, 1,
+          
+            1, -1, -1, 1,  1, 0, 0, 1,  0, 1,
+            -1, -1, -1, 1, 0, 0, 0, 1,  1, 1,
+            -1, 1, -1, 1,  0, 1, 0, 1,  1, 0,
+            1, 1, -1, 1,   1, 1, 0, 1,  0, 0,
+            1, -1, -1, 1,  1, 0, 0, 1,  0, 1,
+            -1, 1, -1, 1,  0, 1, 0, 1,  1, 0,
+          ]);
+
+        const mvpMatrix=Matrix4.MakePerspective((2 * Math.PI) / 5,
+        this.m_width/this.m_height,
+        1,
+        100.0);
+
+        mvpMatrix.multiply(new Matrix4().fromTranslation(new Vector3(0, 0, -4)));
         const vb = new VertexBuffer(device, vertices);
-        const vertexBufferLayout = new VertexBufferLayout([new VertexAttribute('float32x4', "a_pos"), new VertexAttribute('float32x4', "a_color")]);
+        const ub=new UniformBuffer(device);
+        const now = Date.now() / 1000;
+        mvpMatrix.multiply(new Matrix4().fromRotationAxis(new Vector3(1,1,1).normalize(),Math.sin(now)*DawnMath.PI));
+        ub.addMatrix4("mvpMatrix",mvpMatrix);
+        const vertexBufferLayout = new VertexBufferLayout([new VertexAttribute('float32x4', "a_pos"), new VertexAttribute('float32x4', "a_color"),new VertexAttribute('float32x2', "a_uv")]);
         const shader = new Shader(device, vertexSrc, fragmentSrc);
         const pipeline = new Pipeline(device, shader, [vertexBufferLayout]);
+        const uniformBindGroup = device.createBindGroup({
+            layout: pipeline.pipeline.getBindGroupLayout(0),
+            entries: [
+              {
+                binding: 0,
+                resource: {
+                  buffer: ub.buffer,
+                },
+              },
+            ],
+          });
         currentPass.setPipeline(pipeline.pipeline);
+        currentPass.setBindGroup(0, uniformBindGroup);
         currentPass.setVertexBuffer(0, vb.buffer);
-        currentPass.draw(vertices.length / 8);
+        currentPass.draw(vertices.length / 10);
     }
 
     getDrawingBufferSize(): Vector2 {
