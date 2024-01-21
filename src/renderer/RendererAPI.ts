@@ -13,7 +13,7 @@ import Vector3 from "../math/Vector3";
 import DawnMath from "../math/DawnMath";
 import Cube from "../geometries/Cube";
 import Sampler from "./Sampler";
-import Texture from "./Texture";
+import Texture2D from "./Texture2D";
 import ImageBitmapLoader from "../loaders/ImageBitmapLoader";
 
 let myBitMap: any = undefined;
@@ -205,7 +205,7 @@ class RendererAPI {
         const vertexBufferLayout = new VertexBufferLayout(cube.getAttributes());
         const shader = new Shader(device, vertexSrc, fragmentSrc);
         const sampler = new Sampler(device);
-        const texture = new Texture(device, myBitMap.width, myBitMap.height, myBitMap);
+        const texture = new Texture2D(device, myBitMap.width, myBitMap.height, myBitMap);
         const pipeline = new Pipeline(device, shader, [vertexBufferLayout]);
         const uniformBindGroup = device.createBindGroup({
             layout: pipeline.pipeline.getBindGroupLayout(0),
@@ -222,7 +222,7 @@ class RendererAPI {
                 },
                 {
                     binding: 2,
-                    resource: texture.texture.createView(),
+                    resource: texture.createView(),
                 },
             ],
         });
