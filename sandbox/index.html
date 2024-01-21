@@ -22,7 +22,7 @@
 		import { Renderer, RendererParam } from 'dawn';
 		let rendererParam = new RendererParam();
 		rendererParam.containerID = "container";
-		let renderer = new Renderer(rendererParam)
+		let renderer = new Renderer(rendererParam);
 		renderer.init().then(() => {
 			renderer.clearColor = { r: 0.0, g: 1.0, b: 1.0, a: 1.0 }
 			function frame()

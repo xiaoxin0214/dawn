@@ -10,8 +10,14 @@ import Shader from "./Shader";
 import UniformBuffer from "./UniformBuffer";
 import Matrix4 from "../math/Matrix4";
 import Vector3 from "../math/Vector3";
-import { DawnMath } from "../index";
+import DawnMath from "../math/DawnMath";
+import Cube from "../geometries/Cube";
+import Sampler from "./Sampler";
+import Texture from "./Texture";
+import ImageBitmapLoader from "../loaders/ImageBitmapLoader";
 
+let myBitMap: any = undefined;
+let myBitMapRequesting = false;
 class RendererAPI {
     constructor(params: RendererParam) {
         this.m_params = params;
@@ -133,7 +139,100 @@ class RendererAPI {
 
     }
 
-    drawRect(renderContext: RenderContext) {
+    drawTexturedCube(renderContext: RenderContext) {
+        if (!myBitMap) {
+            if (!myBitMapRequesting) {
+                let imageBitmapLoader = new ImageBitmapLoader();
+                imageBitmapLoader.loadAsync("./Di-3d.png").then((res) => {
+                    myBitMap = res;
+                });
+                myBitMapRequesting = true;
+            }
+
+            return;
+        }
+
+        const currentPass = renderContext.currentPass;
+        const device = this.m_device;
+        if (!currentPass || !device)
+            return;
+
+        const vertexSrc = `
+        struct Uniforms {
+            modelViewProjectionMatrix : mat4x4<f32>,
+        }
+        @binding(0) @group(0) var<uniform> uniforms : Uniforms;
+
+        struct VertexOutput {
+            @builtin(position) Position : vec4<f32>,
+            @location(0) fragUV : vec2<f32>,
+            @location(1) fragPosition: vec4<f32>,
+          }
+
+        @vertex
+        fn main(
+          @location(0) pos : vec4<f32>,
+          @location(1) color : vec4<f32>,
+          @location(2) uv : vec2<f32>
+        ) -> VertexOutput {
+            var output : VertexOutput;
+            output.Position = uniforms.modelViewProjectionMatrix * pos;
+            output.fragUV = uv;
+            output.fragPosition = 0.5 * (pos + vec4(1.0, 1.0, 1.0, 1.0));
+            return output;
+        }`;
+        const fragmentSrc = `@group(0) @binding(1) var mySampler: sampler;
+        @group(0) @binding(2) var myTexture: texture_2d<f32>;
+        @fragment
+        fn main(@location(0) fragUV: vec2<f32>,
+        @location(1) fragPosition: vec4<f32>) -> @location(0) vec4<f32> {
+            return textureSample(myTexture, mySampler, fragUV) * fragPosition;
+        }`;
+
+        let cube = new Cube();
+        const vertices = cube.getVertices();
+        const mvpMatrix = Matrix4.MakePerspective((2 * Math.PI) / 5,
+            this.m_width / this.m_height,
+            1,
+            100.0);
+
+        mvpMatrix.multiply(new Matrix4().fromTranslation(new Vector3(1.5, 0, -4)));
+        const vb = new VertexBuffer(device, vertices);
+        const ub = new UniformBuffer(device);
+        const now = Date.now() / 1000;
+        mvpMatrix.multiply(new Matrix4().fromRotationAxis(new Vector3(1, 1, 1).normalize(), Math.sin(now) * DawnMath.PI));
+        ub.addMatrix4("mvpMatrix", mvpMatrix);
+        const vertexBufferLayout = new VertexBufferLayout(cube.getAttributes());
+        const shader = new Shader(device, vertexSrc, fragmentSrc);
+        const sampler = new Sampler(device);
+        const texture = new Texture(device, myBitMap.width, myBitMap.height, myBitMap);
+        const pipeline = new Pipeline(device, shader, [vertexBufferLayout]);
+        const uniformBindGroup = device.createBindGroup({
+            layout: pipeline.pipeline.getBindGroupLayout(0),
+            entries: [
+                {
+                    binding: 0,
+                    resource: {
+                        buffer: ub.buffer,
+                    },
+                },
+                {
+                    binding: 1,
+                    resource: sampler.sampler,
+                },
+                {
+                    binding: 2,
+                    resource: texture.texture.createView(),
+                },
+            ],
+        });
+        currentPass.setPipeline(pipeline.pipeline);
+        currentPass.setBindGroup(0, uniformBindGroup);
+        currentPass.setVertexBuffer(0, vb.buffer);
+        currentPass.draw(vertices.length / 10);
+    }
+
+    drawCube(renderContext: RenderContext) {
         const currentPass = renderContext.currentPass;
         const device = this.m_device;
         if (!currentPass || !device)
@@ -164,77 +263,34 @@ class RendererAPI {
         fn main(  @location(0) color: vec4<f32>) -> @location(0) vec4<f32> {
           return color;
         }`;
-        const vertices = new Float32Array(36 * 10);
-        vertices.set([
-            // float4 position, float4 color, float2 uv,
-            1, -1, 1, 1,   1, 0, 1, 1,  0, 1,
-            -1, -1, 1, 1,  0, 0, 1, 1,  1, 1,
-            -1, -1, -1, 1, 0, 0, 0, 1,  1, 0,
-            1, -1, -1, 1,  1, 0, 0, 1,  0, 0,
-            1, -1, 1, 1,   1, 0, 1, 1,  0, 1,
-            -1, -1, -1, 1, 0, 0, 0, 1,  1, 0,
-          
-            1, 1, 1, 1,    1, 1, 1, 1,  0, 1,
-            1, -1, 1, 1,   1, 0, 1, 1,  1, 1,
-            1, -1, -1, 1,  1, 0, 0, 1,  1, 0,
-            1, 1, -1, 1,   1, 1, 0, 1,  0, 0,
-            1, 1, 1, 1,    1, 1, 1, 1,  0, 1,
-            1, -1, -1, 1,  1, 0, 0, 1,  1, 0,
-          
-            -1, 1, 1, 1,   0, 1, 1, 1,  0, 1,
-            1, 1, 1, 1,    1, 1, 1, 1,  1, 1,
-            1, 1, -1, 1,   1, 1, 0, 1,  1, 0,
-            -1, 1, -1, 1,  0, 1, 0, 1,  0, 0,
-            -1, 1, 1, 1,   0, 1, 1, 1,  0, 1,
-            1, 1, -1, 1,   1, 1, 0, 1,  1, 0,
-          
-            -1, -1, 1, 1,  0, 0, 1, 1,  0, 1,
-            -1, 1, 1, 1,   0, 1, 1, 1,  1, 1,
-            -1, 1, -1, 1,  0, 1, 0, 1,  1, 0,
-            -1, -1, -1, 1, 0, 0, 0, 1,  0, 0,
-            -1, -1, 1, 1,  0, 0, 1, 1,  0, 1,
-            -1, 1, -1, 1,  0, 1, 0, 1,  1, 0,
-          
-            1, 1, 1, 1,    1, 1, 1, 1,  0, 1,
-            -1, 1, 1, 1,   0, 1, 1, 1,  1, 1,
-            -1, -1, 1, 1,  0, 0, 1, 1,  1, 0,
-            -1, -1, 1, 1,  0, 0, 1, 1,  1, 0,
-            1, -1, 1, 1,   1, 0, 1, 1,  0, 0,
-            1, 1, 1, 1,    1, 1, 1, 1,  0, 1,
-          
-            1, -1, -1, 1,  1, 0, 0, 1,  0, 1,
-            -1, -1, -1, 1, 0, 0, 0, 1,  1, 1,
-            -1, 1, -1, 1,  0, 1, 0, 1,  1, 0,
-            1, 1, -1, 1,   1, 1, 0, 1,  0, 0,
-            1, -1, -1, 1,  1, 0, 0, 1,  0, 1,
-            -1, 1, -1, 1,  0, 1, 0, 1,  1, 0,
-          ]);
 
-        const mvpMatrix=Matrix4.MakePerspective((2 * Math.PI) / 5,
-        this.m_width/this.m_height,
-        1,
-        100.0);
+        let cube = new Cube();
+        const vertices = cube.getVertices();
+        const mvpMatrix = Matrix4.MakePerspective((2 * Math.PI) / 5,
+            this.m_width / this.m_height,
+            1,
+            100.0);
 
-        mvpMatrix.multiply(new Matrix4().fromTranslation(new Vector3(0, 0, -4)));
+        mvpMatrix.multiply(new Matrix4().fromTranslation(new Vector3(-1.5, 0, -4)));
         const vb = new VertexBuffer(device, vertices);
-        const ub=new UniformBuffer(device);
+        const ub = new UniformBuffer(device);
         const now = Date.now() / 1000;
-        mvpMatrix.multiply(new Matrix4().fromRotationAxis(new Vector3(1,1,1).normalize(),Math.sin(now)*DawnMath.PI));
-        ub.addMatrix4("mvpMatrix",mvpMatrix);
-        const vertexBufferLayout = new VertexBufferLayout([new VertexAttribute('float32x4', "a_pos"), new VertexAttribute('float32x4', "a_color"),new VertexAttribute('float32x2', "a_uv")]);
+        mvpMatrix.multiply(new Matrix4().fromRotationAxis(new Vector3(1, 1, 1).normalize(), Math.sin(now) * DawnMath.PI));
+        ub.addMatrix4("mvpMatrix", mvpMatrix);
+        const vertexBufferLayout = new VertexBufferLayout(cube.getAttributes());
         const shader = new Shader(device, vertexSrc, fragmentSrc);
         const pipeline = new Pipeline(device, shader, [vertexBufferLayout]);
         const uniformBindGroup = device.createBindGroup({
             layout: pipeline.pipeline.getBindGroupLayout(0),
             entries: [
-              {
-                binding: 0,
-                resource: {
-                  buffer: ub.buffer,
+                {
+                    binding: 0,
+                    resource: {
+                        buffer: ub.buffer,
+                    },
                 },
-              },
             ],
-          });
+        });
         currentPass.setPipeline(pipeline.pipeline);
         currentPass.setBindGroup(0, uniformBindGroup);
         currentPass.setVertexBuffer(0, vb.buffer);

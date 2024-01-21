@@ -1,6 +1,7 @@
 import BaseObject from "./base/BaseObject";
 import ICloneable from "./base/ICloneable";
 import IDisposable from "./base/IDisposable";
+import HtmlUtil from "./base/HtmlUtil";
 import { float, FloatArray, Nullable } from "./base/Type";
 
 import DawnMath from "./math/DawnMath";
@@ -14,8 +15,14 @@ import Plane from "./math/Plane";
 import Cartographic from "./gis/Cartographic";
 import Ellipsoid from "./gis/Ellipsoid";
 
+import Cube from "./geometries/Cube";
+
 import RendererParam from "./renderer/RendererParam";
 import Renderer from "./renderer/Renderer";
+
+import Loader from "./loaders/Loader";
+import ImageLoader from "./loaders/ImageLoader"
+import ImageBitmapLoader from "./loaders/ImageBitmapLoader";
 
 export {
     float,
@@ -26,7 +33,8 @@ export {
 export {
     ICloneable,
     IDisposable,
-    BaseObject
+    BaseObject,
+    HtmlUtil
 }
 
 export {
@@ -45,6 +53,16 @@ export {
 }
 
 export {
+    Cube
+}
+
+export {
     RendererParam,
     Renderer
+}
+
+export {
+    Loader,
+    ImageLoader,
+    ImageBitmapLoader
 }
