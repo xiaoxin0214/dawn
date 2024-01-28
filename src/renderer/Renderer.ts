@@ -62,8 +62,9 @@ class Renderer {
 
     beginScene() {
         this.m_rendererAPI.beginRender(this.m_renderContext);
-        this.m_rendererAPI.drawCube(this.m_renderContext);
-        this.m_rendererAPI.drawTexturedCube(this.m_renderContext);
+        //this.m_rendererAPI.drawCube(this.m_renderContext);
+        //this.m_rendererAPI.drawTexturedCube(this.m_renderContext);
+        this.m_rendererAPI.drawCubeMap(this.m_renderContext);
     }
 
     endScene() {

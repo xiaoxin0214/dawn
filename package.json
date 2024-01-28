@@ -5,9 +5,11 @@
   "main": "src/index.ts",
   "type": "module",
   "scripts": {
+    "start":"npm run dev",
     "build": "rollup --config",
     "doc": "typedoc",
-    "test": "jest"
+    "test": "jest",
+    "dev": "concurrently --names \"ROLLUP,HTTP\" -c \"bgBlue.bold,bgGreen.bold\" \"rollup --config -w -m inline\" \"servez -p 8080\""
   },
   "repository": {
     "type": "git",
@@ -30,6 +32,8 @@
     "ts-node": "^10.9.1",
     "tslib": "^2.6.2",
     "typedoc": "^0.25.3",
-    "typescript": "^5.2.2"
+    "typescript": "^5.2.2",
+    "concurrently": "^8.0.1",
+    "servez": "^2.0.0"
   }
 }
