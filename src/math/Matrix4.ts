@@ -314,23 +314,23 @@ class Matrix4 extends BaseObject implements ICloneable<Matrix4> {
      * @param angle rotation angle in radians
      * @returns 
      */
-    fromRotationAxis(axis:Vector3,angle:number):Matrix4{
-        const c = Math.cos( angle );
-		const s = Math.sin( angle );
-		const t = 1 - c;
-		const x = axis.x, y = axis.y, z = axis.z;
-		const tx = t * x, ty = t * y;
+    fromRotationAxis(axis: Vector3, angle: number): Matrix4 {
+        const c = Math.cos(angle);
+        const s = Math.sin(angle);
+        const t = 1 - c;
+        const x = axis.x, y = axis.y, z = axis.z;
+        const tx = t * x, ty = t * y;
 
-		this.set(
+        this.set(
 
-			tx * x + c, tx * y - s * z, tx * z + s * y, 0,
-			tx * y + s * z, ty * y + c, ty * z - s * x, 0,
-			tx * z - s * y, ty * z + s * x, t * z * z + c, 0,
-			0, 0, 0, 1
+            tx * x + c, tx * y - s * z, tx * z + s * y, 0,
+            tx * y + s * z, ty * y + c, ty * z - s * x, 0,
+            tx * z - s * y, ty * z + s * x, t * z * z + c, 0,
+            0, 0, 0, 1
 
-		);
+        );
 
-		return this;
+        return this;
     }
 
     /**
@@ -415,11 +415,9 @@ class Matrix4 extends BaseObject implements ICloneable<Matrix4> {
         return result;
     }
 
-    static MakePerspective(fov:number,aspect:number,near:number,far:number,result:Matrix4|undefined=undefined):Matrix4
-    {
-        if(result===undefined)
-        {
-            result=new Matrix4();
+    static MakePerspective(fov: number, aspect: number, near: number, far: number, result: Matrix4 | undefined = undefined): Matrix4 {
+        if (result === undefined) {
+            result = new Matrix4();
         }
 
         const bottom = Math.tan(fov * 0.5);
@@ -428,7 +426,7 @@ class Matrix4 extends BaseObject implements ICloneable<Matrix4> {
         const column0Row0 = column1Row1 / aspect;
         const column2Row2 = (far + near) / (near - far);
         const column3Row2 = (2.0 * far * near) / (near - far);
-      
+
         const elements = result.elements;
         elements[0] = column0Row0;
         elements[1] = 0.0;
@@ -447,6 +445,66 @@ class Matrix4 extends BaseObject implements ICloneable<Matrix4> {
         elements[14] = column3Row2;
         elements[15] = 0.0;
         return result;
+    }
+
+    static MakeOrthographic(left: float, right: float, bottom: float, top: float, near: float, far: float, result: Matrix4 | undefined = undefined): Matrix4 {
+        if (result === undefined) {
+            result = new Matrix4();
+        }
+
+        let a = 1.0 / (right - left);
+        let b = 1.0 / (top - bottom);
+        let c = 1.0 / (far - near);
+
+        const tx = -(right + left) * a;
+        const ty = -(top + bottom) * b;
+        const tz = -(far + near) * c;
+        a *= 2.0;
+        b *= 2.0;
+        c *= -2.0;
+
+        const elements = result.elements;
+        elements[0] = a;
+        elements[1] = 0.0;
+        elements[2] = 0.0;
+        elements[3] = 0.0;
+        elements[4] = 0.0;
+        elements[5] = b;
+        elements[6] = 0.0;
+        elements[7] = 0.0;
+        elements[8] = 0.0;
+        elements[9] = 0.0;
+        elements[10] = c;
+        elements[11] = 0.0;
+        elements[12] = tx;
+        elements[13] = ty;
+        elements[14] = tz;
+        elements[15] = 1.0;
+
+        return result;
+
+    }
+
+    static MakeLookat(eye: Vector3, center: Vector3, up: Vector3, res: Matrix4 | undefined = undefined): Matrix4 {
+        if (res === undefined) {
+            res = new Matrix4();
+        }
+
+        let look: Vector3 = center.clone().subtract(eye).normalize();
+        let side: Vector3 = Vector3.Cross(look, up).normalize();
+        let upTemp = Vector3.Cross(side, look).normalize();
+
+        res.set(
+            side.x, side.y, side.z, 0,
+            upTemp.x, upTemp.y, upTemp.z, 0,
+            -look.x, -look.y, -look.z, 0,
+            0, 0, 0, 1
+        );
+
+        let translation = new Matrix4();
+        translation.fromTranslation(new Vector3(-eye.x, -eye.y, -eye.z));
+        res = res.multiply(translation)
+        return res;
     }
     static readonly IDENTITY: Matrix4 = new Matrix4();
 

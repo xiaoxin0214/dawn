@@ -1,6 +1,7 @@
 import RendererParam from "./RendererParam";
 import RendererAPI from "./RendererAPI";
 import RenderContext from "./RenderContext";
+import Camera from "./Camera";
 
 class Renderer {
     constructor(params: RendererParam) {
@@ -60,11 +61,12 @@ class Renderer {
         this.m_renderContext.clearStencil = value
     }
 
-    beginScene() {
+    beginScene(camera:Camera) {
+        this.m_renderContext.viewProjection=camera.projection.clone().multiply(camera.view)
         this.m_rendererAPI.beginRender(this.m_renderContext);
         //this.m_rendererAPI.drawCube(this.m_renderContext);
-        //this.m_rendererAPI.drawTexturedCube(this.m_renderContext);
-        this.m_rendererAPI.drawCubeMap(this.m_renderContext);
+        this.m_rendererAPI.drawTexturedCube(this.m_renderContext);
+        //this.m_rendererAPI.drawCubeMap(this.m_renderContext);
     }
 
     endScene() {

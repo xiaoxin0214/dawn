@@ -203,12 +203,9 @@ class RendererAPI {
 
         let cube = new Cube();
         const vertices = cube.getVertices();
-        const mvpMatrix = Matrix4.MakePerspective((2 * Math.PI) / 5,
-            this.m_width / this.m_height,
-            1,
-            100.0);
+        const mvpMatrix = renderContext.viewProjection.clone();
 
-        mvpMatrix.multiply(new Matrix4().fromTranslation(new Vector3(1.5, 0, -4)));
+        //mvpMatrix.multiply(new Matrix4().fromTranslation(new Vector3(1.5, 0, -4)));
         const vb = new VertexBuffer(device, vertices);
         const ub = new UniformBuffer(device);
         const now = Date.now() / 1000;
@@ -278,12 +275,8 @@ class RendererAPI {
 
         let cube = new Cube();
         const vertices = cube.getVertices();
-        const mvpMatrix = Matrix4.MakePerspective((2 * Math.PI) / 5,
-            this.m_width / this.m_height,
-            1,
-            100.0);
+        const mvpMatrix = renderContext.viewProjection.clone();
 
-        mvpMatrix.multiply(new Matrix4().fromTranslation(new Vector3(-1.5, 0, -4)));
         const vb = new VertexBuffer(device, vertices);
         const ub = new UniformBuffer(device);
         const now = Date.now() / 1000;

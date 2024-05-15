@@ -1,3 +1,5 @@
+import Matrix4 from "../math/Matrix4";
+
 class RenderContext {
     constructor() {
         this.m_isClearColor = true;
@@ -6,6 +8,7 @@ class RenderContext {
         this.m_clearDepth = 1;
         this.m_isClearStencil = true;
         this.m_clearStencil = 0;
+        this.m_viewProjection=new Matrix4();
     }
 
     set isClearColor(value: boolean) {
@@ -72,6 +75,16 @@ class RenderContext {
         this.m_currentEncoder = value
     }
 
+    get viewProjection():Matrix4
+    {
+        return this.m_viewProjection;
+    }
+
+    set viewProjection(value:Matrix4)
+    {
+        this.m_viewProjection=value;
+    }
+
     private m_isClearColor: boolean;
     private m_clearColor: GPUColor;
 
@@ -83,6 +96,8 @@ class RenderContext {
 
     private m_currentPass: GPURenderPassEncoder | undefined;
     private m_currentEncoder: GPUCommandEncoder | undefined;
+
+    private m_viewProjection:Matrix4;
 }
 
 export default RenderContext;

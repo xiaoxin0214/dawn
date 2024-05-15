@@ -11,6 +11,9 @@ import Vector4 from "./math/Vector4";
 import Matrix3 from "./math/Matrix3";
 import Matrix4 from "./math/Matrix4";
 import Plane from "./math/Plane";
+import Perspective from "./math/Perspective";
+import Orthographic from "./math/Orthographic";
+import LookAt from "./math/LookAt";
 
 import Cartographic from "./gis/Cartographic";
 import Ellipsoid from "./gis/Ellipsoid";
@@ -19,6 +22,7 @@ import Cube from "./geometries/Cube";
 
 import RendererParam from "./renderer/RendererParam";
 import Renderer from "./renderer/Renderer";
+import Camera from "./renderer/Camera";
 
 import Loader from "./loaders/Loader";
 import ImageLoader from "./loaders/ImageLoader"
@@ -44,7 +48,10 @@ export {
     Vector4,
     Matrix3,
     Matrix4,
-    Plane
+    Plane,
+    Orthographic,
+    Perspective,
+    LookAt
 }
 
 export {
@@ -58,7 +65,8 @@ export {
 
 export {
     RendererParam,
-    Renderer
+    Renderer,
+    Camera
 }
 
 export {
